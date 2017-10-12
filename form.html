@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Hello World</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+
+			class EntryForm extends React.Component {
+				constructor(props){
+					super(props);
+					this.add = this.add.bind(this);
+				}
+				
+				add(event){
+					event.preventDefault();
+					var newdata = {};
+					this.props.inputs.map(function(item, i) {
+						newdata[item.name] = (ReactDOM.findDOMNode(this.refs['input-' + i]).value);
+					}.bind(this));
+					this.props.enter(newdata);
+					event.target.reset();
+				}
+				
+				render(){
+					return(
+						<form onSubmit={this.add}>
+                          {
+                            this.props.inputs.map((item, i) => (
+                                <div className="form-group" key={i}>
+                                            <input className="form-control" key={i} type={item.type} name={item.name} placeholder={item.placeholder} ref={'input-' + i}/>
+                                </div>
+                            ))
+                          }
+                          <input type="submit" value="Submit" className="btn btn-primary"/>
+						</form>
+					)
+				}
+			}
+
+			class View extends React.Component {
+				render(){
+					return(
+						<table className="table table-striped table-bordered">
+							<thead>
+								<tr>
+									{
+                                      this.props.head.map((item, i) => (
+                                          <th key={i}>
+                                                  {item.placeholder}
+                                          </th>
+                                      ))
+									}
+								</tr>
+							</thead>
+							<tbody>
+                              {
+                                this.props.rowsData.map((item, i) => (
+                                    <tr key={i}>
+                                         {
+                                                Object.keys(item).map((key, i) => (
+                                                    <td>{item[key]}</td>
+                                                ))   
+                                            }
+                                    </tr>
+                                ))
+                              }
+							</tbody>
+						</table>
+					)
+				}
+			}
+
+			class Registration extends React.Component {
+				constructor(props){
+					super(props);
+					this.state = {
+							data: [],
+							inputs : [
+									{ type: 'text', name:'name', placeholder: 'Name' },
+									{ type: 'email', name:'email', placeholder: 'Email Address' },
+									{ type: 'text', name:'contact_no', placeholder: 'Contact No' }
+							]
+						};
+					this.push = this.push.bind(this);
+				}
+
+				push(newdata){
+                  const prevdata = this.state.data;
+                  prevdata.push(newdata);
+                  this.setState({data: prevdata});
+				}
+
+				render(){
+					return(
+						<div className='panel-body col-sm-6 col-sm-offset-3'>
+							<EntryForm enter={this.push} inputs={this.state.inputs}/>
+							<br/>
+							<View head={this.state.inputs} rowsData={this.state.data}/>
+						</div>
+					)
+				}
+			}
+
+			ReactDOM.render(
+				<Registration/>,
+				document.getElementById('root')
+			);
+
+
+    </script>
+  </body>
+</html>
+<!---->
